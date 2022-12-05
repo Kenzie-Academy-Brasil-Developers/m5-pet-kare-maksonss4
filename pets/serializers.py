@@ -18,6 +18,11 @@ class PetSerializer(serializers.Serializer):
     group = GroupSerializer()
     traits = TraitSerializer(many=True)
 
+    traits_count = serializers.SerializerMethodField()
+
+    def get_traits_count(self, obj):
+        return len(obj.traits.all())
+
     def create(self, validated_data: dict) -> Pet:
         traits_list = validated_data.pop("traits")
         group_dict = validated_data.pop("group")
