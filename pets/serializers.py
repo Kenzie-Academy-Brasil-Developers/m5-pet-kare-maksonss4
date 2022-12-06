@@ -30,9 +30,7 @@ class PetSerializer(serializers.Serializer):
         pet_obj = Pet.objects.create(**validated_data)
 
         for trait in traits_list:
-            trait_obj, trait_already_exists = Trait.objects.get_or_create(
-                **trait,
-            )
+            trait_obj, trait_already_exists = Trait.objects.get_or_create(**trait)
 
             trait_obj.pets.add(pet_obj)
 
@@ -44,6 +42,7 @@ class PetSerializer(serializers.Serializer):
 
     def update(self, instance: Pet, validated_data: dict):
         traits_list = validated_data.pop("traits", None)
+        group_dict = validated_data.pop("group", None)
 
         for key, value in validated_data.items():
             setattr(instance, key, value)
@@ -57,5 +56,10 @@ class PetSerializer(serializers.Serializer):
                 )
 
                 trait_obj.pets.add(instance)
+
+        if group_dict:
+            group_obj, group_already_exists = Group.objects.get_or_create(**group_dict)
+
+            instance.group = group_obj
 
         return instance
